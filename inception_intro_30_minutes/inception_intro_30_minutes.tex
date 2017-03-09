@@ -1,0 +1,709 @@
+\documentclass{beamer}
+
+\usepackage{skull} % for skull symbol
+\usepackage{graphicx}
+\usepackage{amsmath}
+%\usepackage{mathabx} % for convolution symbol
+\usepackage{pgfplots} % for tikzpicture
+\usepackage{color}
+\usepackage{tikz}
+%\usepackage{pgf}
+%\usetikzlibrary{shapes,matrix}
+\usetikzlibrary{matrix}
+
+\def\layersep{1.5cm}
+
+% for colored math symbols
+\newcommand*{\mathcolor}{}
+\def\mathcolor#1#{\mathcoloraux{#1}}
+\newcommand*{\mathcoloraux}[3]{%
+  \protect\leavevmode
+  \begingroup
+    \color#1{#2}#3%
+  \endgroup
+}
+
+\mode<notes>{
+%\usetheme{Berkeley}
+\definecolor{uofsgreen}{rgb}{0.125,0.5,0.25}
+\usecolortheme[named=uofsgreen]{structure}
+}
+
+\setbeamerfont{page number in head/foot}{size=\large}
+\setbeamertemplate{footline}[frame number]
+
+%\title[Short Paper Title]{Dermatologist-level classification of skin cancer with deep neural networks}
+%\subtitle{A. Esteva, B. Kuprel, R.A. Novoa, J. Ko, S.M. Swetter, 
+%H.M. Blau, and S. Thrun} % (optional)
+\title[Short Paper Title]{Inception Architecture}
+\subtitle{A 30 Minutes Introduction from Scratch}
+%\author{Shubhra Aich}
+\institute{}
+\author{\texorpdfstring{Shubhra Aich\newline\url{s.aich.72@gmail.com}}{Shubhra Aich}}
+\date{March 09, 2017}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Outline}
+  \tableofcontents
+\end{frame}
+
+\section{Architectural Overview}
+
+\subsection{RGB image basics}
+\begin{frame}
+	\frametitle{RGB image basics}
+	\begin{minipage}{0.45\textwidth}	 		
+	\textcolor{red}{R}\textcolor{green}{G}\textcolor{blue}{B} image consists of 3 channels or planes, namely \textcolor{red}{Red}, \textcolor{green}{Green} and \textcolor{blue}{Blue}. \\
+	We see the combined effect of these channels.
+	\end{minipage}	
+	\begin{minipage}{0.45\textwidth}
+		\hspace{1em}	
+		\begin{figure}
+	\includegraphics[scale=0.12]{./figures/edit/bayer_sensor.png} 				
+	\end{figure}
+			
+	\end{minipage} \\
+	\begin{minipage}{0.60\textwidth}	 				\begin{figure} 									\includegraphics[width=0.7\textwidth]{./figures/edit/rgb_sample.png} 
+		\end{figure}
+			
+	\end{minipage}
+\end{frame}
+
+\subsection{ANN vs CNN}
+
+\begin{frame}
+	\frametitle{Artifical \textit{vs} Convolutional NN}
+	\begin{figure}
+		\includegraphics[scale=0.30]{./figures/edit/ann.png} \\
+		\includegraphics[scale=0.32]{./figures/edit/cnn.png} 
+	\end{figure}
+\end{frame}
+
+
+\subsection{Operations in CNN}
+\begin{frame}
+	\frametitle{Operations in CNN}
+	\begin{itemize}
+		\item Convolution
+		\item Rectification
+		\item Pooling
+		\item Dropout
+	\end{itemize}
+\end{frame}
+
+\subsubsection{Convolution}
+
+\begin{frame}
+	\frametitle{Convolution ...(1)}
+	\begin{figure}
+		\includegraphics[scale=0.28]{./figures/edit/conv_03_edit.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Convolution ...(2)}
+	\begin{figure}
+		\includegraphics[scale=0.28]{./figures/edit/conv_04_edit.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Convolution ...(3)}
+	\begin{figure}	
+		\includegraphics[scale=0.28]{./figures/edit/conv_05_edit.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Convolution ...(4)}
+	\begin{figure}
+		\includegraphics[scale=0.28]{./figures/edit/conv_06_edit.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Convolution ...(5)}
+	\begin{figure}	
+		\includegraphics[scale=0.28]{./figures/edit/conv_07_edit.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Convolution ...(6)}
+	\begin{figure}
+		\includegraphics[scale=0.28]{./figures/edit/conv_08_edit.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Equations of Convolution}
+	\begin{figure}
+		\includegraphics[scale=0.28]{./figures/edit/conv_02.png}
+	\end{figure} \\
+	\begin{multiline}
+		w_i = \text{weights of the filter} \\
+		x_i = \text{outputs of the previous layer} \\
+		z = \sum_{i} w_i x_i + b = w.x + b \mathcolor{red}{\equiv w \ast x + b} \\
+		a = f(z) \\
+		f = \text{activation/ rectification / squashing function} \\
+	\end{multiline}
+\end{frame}
+
+\subsubsection{Pooling}
+
+\begin{frame}
+	\frametitle{Pooling}
+	\begin{figure}
+		\includegraphics[scale=0.23]{./figures/edit/max_pool.png}
+	\end{figure}	
+		\begin{itemize}
+		\item Max-pooling.
+		\item Average pooling.
+		\pause
+		\item Min-pooling 
+		\pause
+		$\mathcolor{red}{ \skull } $
+	\end{itemize}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Why do we use Convolution and Pooling? ...(1)}
+	CNN combines 3 architectural ideas to deal with shift, scale and distortion.
+	\begin{itemize}
+		\item Local receptive fields/filters 
+		\begin{itemize}
+			\item The idea of local filters dates back to Hubel-Wiesel's discovery of locally sensitive, orientation selective neurons in the cat's visual cortex.
+			\item It helps to extract elementary visual features, such as edges, corners, end-points etc. 
+		\end{itemize}
+		\item Shared weights
+		\begin{itemize}
+			\item Distortions or shifts of the input causes the position of salient features to vary.			
+			\item Elementary feature detectors that are useful on one region of the image are likely to be useful across the entire image. 
+			\item This knowledge can be applied by forcing a set of units, whose receptive fields are located at different places on the to be identical.
+			\item These features are combined by subsequent layers to detect more meaningful features.			
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Why do we use Convolution and Pooling? ...(2)}
+	\begin{itemize}
+		\item Sub-sampling/Pooling
+		\begin{itemize}
+			\item Once a feature is detected, its exact location becomes less important, only approximate position relative to other features is relevant.
+			\item This precise position is even harmful they vary from image to image.
+			\item The simplest way to reduce this precision is sub-sampling or pooling.
+		\end{itemize}
+	\end{itemize}		  
+\end{frame}
+
+\subsubsection{Rectification}
+
+\begin{frame}
+	\frametitle{Rectification}
+	\begin{itemize}
+		\item Linear neuron, $ y = wx + b $
+		\item Rectified linear neuron (ReLU), 
+			$ y = 
+			\begin{cases} 
+				wx + b, & \text{if} x > 0 \\
+				0, & \text{otherwise} 
+			\end{cases} $
+		\item Sigmoid/logistic neuron, $ y = \frac{1}{1+exp(-\alpha(wx + b))} $
+		
+	\end{itemize}
+\begin{center}
+\resizebox{8cm}{5cm}{%
+\begin{tikzpicture}
+    \begin{axis}%
+    [
+        grid=major,     
+        xmin=-1,
+        xmax=1,
+        axis x line=bottom,
+        ytick={0,.5,1},
+        ymax=1,
+        axis y line=middle,
+    ]
+        \addplot%
+        [
+            blue,%
+            mark=none,
+            samples=1000,
+            domain=-1:1,
+        ]
+        (x,{1/(1+exp(-5*x))});
+        
+        \addplot%
+        [
+            cyan,%
+            mark=none,
+            samples=100,
+            domain=-6:6,
+        ]
+        (x,{0.8*x});
+        
+        \addplot%
+        [
+            magenta,%
+            mark=none,
+            samples=10,
+            domain=-1:0,
+        ]
+        (x,{0});
+        \addplot%
+        [
+            magenta,%
+            mark=none,
+            samples=10,
+            domain=0:1,
+        ]
+        (x,{1.2*x});        
+    \end{axis}
+\end{tikzpicture}
+}
+\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Choice of Recitification Functions }
+	\begin{itemize}
+		\item Backpropagation is the most popular learning algorithm for 
+		a network comprising real-valued units. 
+		\item This learning algorithm adjusts the weights in each iteration 		in proportion to the derivative of the final error function w.r.t. 
+		the weights.
+		\item To facilitate learning, rectification functions are expected 			to have more or less smooth derivatives.
+		\item Linear neurons can map only linear input-output 						relationships.
+		\item Linear neurons are unbounded both below and above.
+		\item Sigmoid activation works well for simple ANN. However, in 
+		deeper models like CNN, tiny error-gradients of sigmoid units make 			learning horrendously slow.
+	\end{itemize}		
+\end{frame}
+
+\subsubsection{Dropout}
+
+\begin{frame}
+	\frametitle{Dropout}
+	\begin{figure}
+		\includegraphics[width=0.25\textwidth]{./figures/edit/full_network.png}
+		\hspace{1em}
+		\includegraphics[width=0.25\textwidth]{./figures/edit/drop_01.png}
+		\hspace{1em}		
+		\includegraphics[width=0.25\textwidth]{./figures/edit/drop_02.png}		
+	\end{figure}
+	
+	\begin{itemize}
+		\item In each iteration of learning, we randomly omit each hidden unit with a prespecified probability.
+		\item Using dropout, for a network comprising single hidden layer with H hidden units, in each iteration, we randomly sample from $2^H$ different architectures.
+		\item All architectures share weights.
+		\item Dropout prevents overfitting.
+		\item In test time, the full network is used with parameter values halved.
+	\end{itemize}
+\end{frame}
+
+\section{Breaking Down Convolution}
+
+\subsection{From 5x5 to 3x3}
+\begin{frame}
+	\frametitle{Breaking down Convolution ... (1)}
+	\begin{itemize}
+	\item Straightforward $5 \times 5$ convolution \\
+	M $\equiv$ Multiplication and A $\equiv$ Addition \\
+	\end{itemize}
+	\begin{minipage}{.4\textwidth}
+		\begin{tikzpicture}
+
+    	%\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    	\matrix (m) [matrix of nodes,
+    		nodes={rectangle,draw, fill=blue!10} ]{
+      			$a_{11}$ && $a_{12}$ && $a_{13}$ && $a_{14}$ && $a_{15}$ \\ 
+      			$a_{21}$ && $a_{22}$ && $a_{23}$ && $a_{24}$ && $a_{25}$ \\ 
+      			$a_{31}$ && $a_{32}$ && $a_{33}$ && $a_{34}$ && $a_{35}$ \\ 
+      			$a_{41}$ && $a_{42}$ && $a_{43}$ && $a_{44}$ && $a_{45}$ \\ 
+      			$a_{51}$ && $a_{52}$ && $a_{53}$ && $a_{54}$ && $a_{55}$ \\       		};
+  		\end{tikzpicture}
+  	\end{minipage}
+  	\begin{minipage}{0.05\textwidth}
+  		\ast
+  	\end{minipage}
+	\begin{minipage}{0.36\textwidth}  	
+		\begin{tikzpicture}
+
+    	%\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    	\matrix (m) [matrix of nodes,
+    		nodes={rectangle,draw, fill=blue!10} ]{
+      			$h_{11}$ && $h_{12}$ && $h_{13}$ && $h_{14}$ && $h_{15}$ \\ 
+      			$h_{21}$ && $h_{22}$ && $h_{23}$ && $h_{24}$ && $h_{25}$ \\ 
+      			$h_{31}$ && $h_{32}$ && $h_{33}$ && $h_{34}$ && $h_{35}$ \\ 
+      			$h_{41}$ && $h_{42}$ && $h_{43}$ && $h_{44}$ && $h_{45}$ \\ 
+      			$h_{51}$ && $h_{52}$ && $h_{53}$ && $h_{54}$ && $h_{55}$ \\  		};
+  		\end{tikzpicture}	
+  	\end{minipage} \\
+  	$ output_{33} = a_{11}h_{11} + a_{12}h_{12} + \dots  + a_{31}h_{31} + a_{32}h_{32} + \dots + a_{54}h_{54} + a_{55}h_{55} $ \\
+  	$\mathcolor{red}{ \equiv } $ \textcolor{red}{25M + 24A} \\
+  	The filter ($h_{ij}$) will slide over the image ($a_{ij}$) for each position once totalling $25$ times. \\
+  	So, total number of gross multiplication and addition  \textcolor{red}{= 25(25M + 24A) = 625M + 600A}
+  	  
+\end{frame}
+
+\begin{frame}
+	\frametitle{Breaking down Convolution ... (2)}
+	\begin{itemize}
+	\item Breaking down $5 \times 5$ convolution into 2 consecutive 
+		 $3 \times 3$ convolutions 
+		 \begin{itemize}
+		 	\item Step - 01: Convolving $5 \times 5$ matrix with $3 \times 3 filter$
+		 \end{itemize}
+	\end{itemize}
+	\begin{minipage}{.38\textwidth}
+    \begin{tikzpicture}
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $a_{11}$ && $a_{12}$ && $a_{13}$ && $a_{14}$ && $a_{15}$ \\
+            $a_{21}$ && $a_{22}$ && $a_{23}$ && $a_{24}$ && $a_{25}$ \\
+            $a_{31}$ && $a_{32}$ && $a_{33}$ && $a_{34}$ && $a_{35}$ \\
+            $a_{41}$ && $a_{42}$ && $a_{43}$ && $a_{44}$ && $a_{45}$ \\
+            $a_{51}$ && $a_{52}$ && $a_{53}$ && $a_{54}$ && $a_{55}$ \\       		};
+    \draw [thick, red] (m-1-1.north west) -- (m-1-3.north east) -- (m-3-3.south east) -- (m-3-1.south west) -- cycle ;
+    \draw [thick, blue] (m-1-3.north west) -- (m-1-5.north east) -- (m-3-5.south east) -- (m-3-3.south west) -- cycle ;
+    \draw [thick, cyan] (m-3-1.north west) -- (m-3-3.north east) -- (m-5-3.south east) -- (m-5-1.south west) -- cycle ;
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.01\textwidth}
+    \ast
+\end{minipage}
+\begin{minipage}{0.23\textwidth}
+    \begin{tikzpicture}
+
+    %\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $h_{11}$ && $h_{12}$ && $h_{13}$ \\
+            $h_{21}$ && $h_{22}$ && $h_{23}$ \\
+            $h_{31}$ && $h_{32}$ && $h_{33}$ \\
+    };
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.01\textwidth}
+=
+\end{minipage}
+\begin{minipage}{0.23\textwidth}
+    \begin{tikzpicture}
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=red!10} ]{
+%            $b_{11}$ && $\mathcolor{red}{b_{11}}$ && $b_{12}$ && $ \mathcolor{blue}{b_{13}} $ \\
+%            $b_{21}$ && $b_{22}$ && $b_{23}$ \\
+%            $ \mathcolor{cyan}{b_{31}} $ && $b_{32}$ && $b_{33}$ \\
+$b_{11}$ && $b_{12}$ && $b_{13}$ && $b_{14}$ && $b_{15}$ \\
+$b_{21}$ && $\mathcolor{red}{b_{22}}$ && $b_{23}$ && $\mathcolor{blue}{b_{24}}$ && $b_{25}$ \\
+$b_{31}$ && $b_{32}$ && $b_{33}$ && $b_{34}$ && $b_{35}$ \\
+$b_{41}$ && $\mathcolor{cyan}{b_{42}}$ && $b_{43}$ && $b_{44}$ && $b_{45}$ \\
+$b_{51}$ && $b_{52}$ && $b_{53}$ && $b_{54}$ && $b_{55}$ \\   
+    };
+    \end{tikzpicture}
+\end{minipage} \\
+\vspace{1em}
+$ b_{22} = a_{11}h_{11} + a_{12}h_{12} + \dots  + a_{32}h_{32} + a_{33} h_{33} $ \\
+$\mathcolor{red}{ \equiv } $ \textcolor{red}{9M + 8A} \\
+\indent This set of operation is performed 25 times, once for each $ a_{ij} $ \\
+\indent So, total multiplication + addition in the first step \\ 
+\indent \textcolor{red}{= 25(9M + 8A) = 225M + 200A} \\
+\end{frame} 
+
+\begin{frame}
+	\frametitle{Breaking down Convolution ... (3)}
+	\begin{itemize}
+	\item Breaking down $5 \times 5$ convolution into 2 consecutive 
+		 $3 \times 3$ convolutions 
+		 \begin{itemize}
+		 	\item Step - 02: Convolving $3 \times 3$ intermediate matrix with another $3 \times 3$ filter
+		 \end{itemize}
+	\end{itemize}
+	\begin{minipage}{0.38\textwidth}
+    \begin{tikzpicture}
+
+    %\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=red!10} ]{
+$b_{11}$ && $b_{12}$ && $b_{13}$ && $b_{14}$ && $b_{15}$ \\
+$b_{21}$ && $b_{22}$ && $b_{23}$ && $b_{24}$ && $b_{25}$ \\
+$b_{31}$ && $b_{32}$ && $b_{33}$ && $b_{34}$ && $b_{35}$ \\
+$b_{41}$ && $b_{42}$ && $b_{43}$ && $b_{44}$ && $b_{45}$ \\
+$b_{51}$ && $b_{52}$ && $b_{53}$ && $b_{54}$ && $b_{55}$ \\ 
+    };
+    \end{tikzpicture}
+	\end{minipage}
+\begin{minipage}{0.01\textwidth}
+    \ast
+\end{minipage}
+\begin{minipage}{0.23\textwidth}
+    \begin{tikzpicture}
+
+    %\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $k_{11}$ && $k_{12}$ && $k_{13}$ \\
+            $k_{21}$ && $k_{22}$ && $k_{23}$ \\
+            $k_{31}$ && $k_{32}$ && $k_{33}$ \\
+    };
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.01\textwidth}
+=
+\end{minipage}
+\begin{minipage}{0.23\textwidth}
+    \begin{tikzpicture}
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=green!10} ]{
+%            $b_{11}$ && $\mathcolor{red}{b_{11}}$ && $b_{12}$ && $ \mathcolor{blue}{b_{13}} $ \\
+%            $b_{21}$ && $b_{22}$ && $b_{23}$ \\
+%            $ \mathcolor{cyan}{b_{31}} $ && $b_{32}$ && $b_{33}$ \\
+$o_{11}$ && $o_{12}$ && $o_{13}$ && $o_{14}$ && $o_{15}$ \\
+$o_{21}$ && $o_{22}$ && $o_{23}$ && $o_{24}$ && $o_{25}$ \\
+$o_{31}$ && $o_{32}$ && $o_{33}$ && $o_{34}$ && $o_{35}$ \\
+$o_{41}$ && $o_{42}$ && $o_{43}$ && $o_{44}$ && $o_{45}$ \\
+$o_{51}$ && $o_{52}$ && $o_{53}$ && $o_{54}$ && $o_{55}$ \\ 
+    };
+    \end{tikzpicture}
+\end{minipage} \\
+\vspace{1em}
+$ o_{22} = b_{11}k_{11} + b_{12}k_{12} + \dots  + b_{32}k_{32} + b_{33}k_{33} $ \\
+$\mathcolor{red}{ \equiv } $ \textcolor{red}{9M + 8A} \\
+\indent Like before, this set of operation is performed 25 times, once for each $ b_{ij} $ \\
+\indent So, total multiplication + addition in the first step \\ 
+\indent \textcolor{red}{= 25(9M + 8A) = 225M + 200A} \\
+\end{frame} 
+
+\begin{frame}
+  \frametitle{Breaking down Convolution ... (4)}
+\begin{minipage}{.38\textwidth}
+    \begin{tikzpicture}
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $a_{11}$ && $a_{12}$ && $a_{13}$ && $a_{14}$ && $a_{15}$ \\
+            $a_{21}$ && $a_{22}$ && $a_{23}$ && $a_{24}$ && $a_{25}$ \\
+            $a_{31}$ && $a_{32}$ && $a_{33}$ && $a_{34}$ && $a_{35}$ \\
+            $a_{41}$ && $a_{42}$ && $a_{43}$ && $a_{44}$ && $a_{45}$ \\
+            $a_{51}$ && $a_{52}$ && $a_{53}$ && $a_{54}$ && $a_{55}$ \\       		};
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.01\textwidth}
+    \ast
+\end{minipage}
+	\begin{minipage}{0.36\textwidth}  	
+		\begin{tikzpicture}
+
+    	%\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    	\matrix (m) [matrix of nodes,
+    		nodes={rectangle,draw, fill=blue!10} ]{
+      			$h_{11}$ && $h_{12}$ && $h_{13}$ && $h_{14}$ && $h_{15}$ \\ 
+      			$h_{21}$ && $h_{22}$ && $h_{23}$ && $h_{24}$ && $h_{25}$ \\ 
+      			$h_{31}$ && $h_{32}$ && $h_{33}$ && $h_{34}$ && $h_{35}$ \\ 
+      			$h_{41}$ && $h_{42}$ && $h_{43}$ && $h_{44}$ && $h_{45}$ \\ 
+      			$h_{51}$ && $h_{52}$ && $h_{53}$ && $h_{54}$ && $h_{55}$ \\  		};
+  		\end{tikzpicture}	
+\end{minipage} \\
+  
+  \begin{itemize}
+  	\item Computational cost of straightforward $ 5\times 5$ convolution \textcolor{red}{= 625M + 600A}.
+  \end{itemize}
+  
+\begin{minipage}{.38\textwidth}
+    \begin{tikzpicture}
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $a_{11}$ && $a_{12}$ && $a_{13}$ && $a_{14}$ && $a_{15}$ \\
+            $a_{21}$ && $a_{22}$ && $a_{23}$ && $a_{24}$ && $a_{25}$ \\
+            $a_{31}$ && $a_{32}$ && $a_{33}$ && $a_{34}$ && $a_{35}$ \\
+            $a_{41}$ && $a_{42}$ && $a_{43}$ && $a_{44}$ && $a_{45}$ \\
+            $a_{51}$ && $a_{52}$ && $a_{53}$ && $a_{54}$ && $a_{55}$ \\       		};
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.01\textwidth}
+    \ast
+\end{minipage}  
+\begin{minipage}{0.23\textwidth}
+    \begin{tikzpicture}
+
+    %\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $h_{11}$ && $h_{12}$ && $h_{13}$ \\
+            $h_{21}$ && $h_{22}$ && $h_{23}$ \\
+            $h_{31}$ && $h_{32}$ && $h_{33}$ \\
+    };
+    \end{tikzpicture}
+\end{minipage}  
+\begin{minipage}{0.01\textwidth}
+    \ast
+\end{minipage} 
+\begin{minipage}{0.23\textwidth}
+    \begin{tikzpicture}
+
+    %\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $k_{11}$ && $k_{12}$ && $k_{13}$ \\
+            $k_{21}$ && $k_{22}$ && $k_{23}$ \\
+            $k_{31}$ && $k_{32}$ && $k_{33}$ \\
+    };
+    \end{tikzpicture}
+\end{minipage}
+
+  \begin{itemize}
+  	\item Computational cost of $ 5\times 5$ convolution using consecutive $3 \times 3$ convolutions \textcolor{red}{= 450M + 400A}.
+  \end{itemize}
+  
+  
+\end{frame}
+
+\begin{frame}
+	\frametitle{Breakding down Convolution ... (5)}
+	\begin{figure}
+		\includegraphics[width=\textwidth]{./figures/edit/5x5.png}
+	\end{figure}
+\end{frame}
+
+\subsection{From 3x3 to 3x1 and 1x3}
+\begin{frame}
+  \frametitle{Breakding down Convolution ... (6)}
+  Breakding down $3 \times 3$ convolution into $3 \times 1$ and $1 \times 3$ convolutions (assymetric breakdown).
+	\begin{itemize}
+		\item Let us calculate the average of a $3 \times 3$ matrix.
+	\end{itemize}	  
+\begin{minipage}{0.15\textwidth}
+    \begin{tikzpicture}
+
+    %\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $9$ && $8$ && $7$ \\
+            $6$ && $5$ && $4$ \\
+            $3$ && $2$ && $1$ \\
+    };
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.01\textwidth}
+    \ast
+\end{minipage} 
+\begin{minipage}{0.15\textwidth}
+    \begin{tikzpicture}
+
+    %\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $\frac{1}{9}$ && $\frac{1}{9}$ && $\frac{1}{9}$ \\
+            $\frac{1}{9}$ && $\frac{1}{9}$ && $\frac{1}{9}$ \\
+            $\frac{1}{9}$ && $\frac{1}{9}$ && $\frac{1}{9}$ \\
+    };
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.03\textwidth}
+    =
+\end{minipage} 
+\begin{minipage}{0.50\textwidth}
+$\frac{9}{9} + \frac{8}{9} + \dots + \frac{2}{9} + \frac{1}{9}$ 
+$\equiv$
+\textcolor{red}{9(9M + 8A)}
+\end{minipage} \\
+\begin{minipage}{0.15\textwidth}
+    \begin{tikzpicture}
+
+    %\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $\frac{1}{9}$ && $\frac{1}{9}$ && $\frac{1}{9}$ \\
+            $\frac{1}{9}$ && $\frac{1}{9}$ && $\frac{1}{9}$ \\
+            $\frac{1}{9}$ && $\frac{1}{9}$ && $\frac{1}{9}$ \\
+    };
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.01\textwidth}
+    =
+\end{minipage} 
+\begin{minipage}{0.07\textwidth}
+    \begin{tikzpicture}
+
+    %\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $\frac{1}{3}$ \\
+            $\frac{1}{3}$ \\
+            $\frac{1}{3}$ \\
+    };
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.15\textwidth}
+\begin{tikzpicture}
+
+    %\matrix[matrix of nodes,nodes={draw},row 										1 2/.style={nodes={fill=blue!20}}] {
+    \matrix (m) [matrix of nodes,
+        nodes={rectangle,draw, fill=blue!10} ]{
+            $\frac{1}{3}$ && $\frac{1}{3}$ && $\frac{1}{3}$ \\
+    };
+\end{tikzpicture} 
+\end{minipage} 
+\begin{minipage}{0.50\textwidth}
+	\vspace{1em}
+    $\equiv$
+    \textcolor{red}{9(3M + 2A) + 9(3M + 2A)} \\
+    \hspace{5em} = \textcolor{red}{9(6M + 4A)} \\
+\end{minipage} \\
+\begin{itemize}
+	\item The average kernel is a \textcolor{red}{separable filter (rank-1 matrix)}. 
+\end{itemize}
+\end{frame}
+
+\section{Inception Architecture}
+
+\subsection{Inception modules}
+
+\begin{frame}
+	\frametitle{Inception Modules ... (1)}
+	\begin{figure}
+		\includegraphics[width=0.45\textwidth]{./figures/edit/inception_org.png}
+		\hspace{0.05\textwidth} 
+		\includegraphics[width=0.45\textwidth]{./figures/edit/breakdown_01.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Inception Modules ... (2)}
+	\begin{figure}
+		\includegraphics[width=0.45\textwidth]{./figures/edit/breakdown_01.png}
+		\hspace{0.05\textwidth} 
+		\includegraphics[width=0.45\textwidth]{./figures/edit/breakdown_02.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Inception Modules - Final}
+	\begin{figure}
+		\includegraphics[width=0.45\textwidth]{./figures/edit/breakdown_02.png}
+		\hspace{0.05\textwidth} 
+		\includegraphics[width=0.45\textwidth]{./figures/edit/breakdown_coarse.png}		
+	\end{figure}
+\end{frame}
+
+\subsection{Final architecture}
+
+\begin{frame}
+	\frametitle{Complete Architecture}
+	\begin{figure}
+		\includegraphics[width=\textwidth, height=4cm]{./figures/edit/inception_v3.png} \\
+		\includegraphics[width=0.2\textwidth]{./figures/edit/inception_layers.png} 
+		\hspace{1em}
+		\includegraphics[width=0.35\textwidth, height=3.5cm]{./figures/edit/breakdown_02.png}		
+		\includegraphics[width=0.35\textwidth, height=3.5cm]{./figures/edit/breakdown_coarse.png}		
+	\end{figure}
+\end{frame}
+
+\end{document}
+
+
