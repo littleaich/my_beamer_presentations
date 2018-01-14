@@ -1,0 +1,7 @@
+\beamer@endinputifotherversion {3.36pt}
+\beamer@subsectionintoc {0}{1}{LeNet5}{3}{0}{0}
+\beamer@subsectionintoc {0}{2}{AlexNet}{4}{0}{0}
+\beamer@subsectionintoc {0}{3}{VGG}{9}{0}{0}
+\beamer@subsectionintoc {0}{4}{Inception}{16}{0}{0}
+\beamer@subsectionintoc {0}{5}{ResNet}{32}{0}{0}
+\beamer@subsectionintoc {0}{6}{DenseNet}{36}{0}{0}
